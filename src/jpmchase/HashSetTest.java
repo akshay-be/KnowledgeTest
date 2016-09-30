@@ -23,6 +23,7 @@ public class HashSetTest {
 			System.out.println(object instanceof Integer);
 		}*/
 		
+		
 		TreeSet<String> set = new TreeSet<String>();
 		set.add("1");
 		set.add("2");
