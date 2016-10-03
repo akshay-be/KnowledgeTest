@@ -1,4 +1,4 @@
-package hackerrank.test;
+package hackerrank.java;
 
 import java.util.Calendar;
 import java.util.Date;

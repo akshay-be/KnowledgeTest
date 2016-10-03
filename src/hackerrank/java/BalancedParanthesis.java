@@ -1,4 +1,4 @@
-package hackerrank.test;
+package hackerrank.java;
 
 public class BalancedParanthesis {
 
