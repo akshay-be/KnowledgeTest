@@ -1,4 +1,4 @@
-package hackerrank.test;
+package hackerrank.java;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

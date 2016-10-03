@@ -1,4 +1,4 @@
-package hackerrank.test;
+package hackerrank.java;
 
 import java.util.Scanner;
 import java.util.regex.Matcher;
