@@ -1,4 +1,4 @@
-package interview.am;
+package interview.appmat;
 
 public class QuestionException {
 
