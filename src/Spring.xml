@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id="p1" class="com.akshay.spring.learn.Juggler" />
+   
+   <bean id="was" class="com.akshay.spring.learn.Sonnet23Poem" />
+   
+   <bean id="beemu" class="com.akshay.spring.learn.PoeticJuggler" >
+   		<constructor-arg value="15"/>
+   		<constructor-arg ref="was"/>
+   </bean>
+   
+   <bean id="mamu" class="com.akshay.spring.learn.Juggler" >
+   		<property name="numOfRings" value="10" />
+   		
+   </bean>
+   
+   <bean id="xp" class="com.akshay.spring.learn.Sonnet23Poem"/>
+   
+   <bean id="gomu" class="com.akshay.spring.learn.PoeticJuggler" >
+    	<constructor-arg value="5"/>
+   		<property name="poem" ref="xp" />
+   </bean>
+      
+   
+   <bean id="guitar" class="com.akshay.spring.learn.Guitar" />
+   <bean id="tabla" class="com.akshay.spring.learn.Tabla" />
+   <bean id="piaon" class="com.akshay.spring.learn.Piaon" />
+   
+   <bean id="i1" class="com.akshay.spring.learn.Instrumentalist" >
+   		<constructor-arg value="jimi" />
+   		<property name="instrument" ref="guitar" />
+   </bean>
+   
+   <bean id="i2" class="com.akshay.spring.learn.Instrumentalist" >
+   		<constructor-arg value="Zakir" />
+   		<property name="instrument" ref="tabla" />
+   </bean>
+   
+   <bean id="i3" class="com.akshay.spring.learn.Instrumentalist" >
+   		<constructor-arg value="mikshuku" />
+   		<property name="instrument" ref="piaon" />
+   </bean>
+   
+    <bean id="i4" class="com.akshay.spring.learn.OneManBand" >
+   		<constructor-arg value="priyanka" />
+   		<property name="instrument" ref="piaon" />
+   		<property name="instruments">
+   			<list>
+   				<ref bean="guitar" />
+   				<ref bean="guitar" />
+   				<ref bean="tabla" />
+   			</list>
+   		</property>
+   </bean>
+   
+   
+   <bean id="i5" class="com.akshay.spring.learn.OneManBand" >
+   		<constructor-arg value="piggy" />
+   		<property name="instrument" >
+   			<bean class="com.akshay.spring.learn.Piaon" />
+   		</property>
+   		<property name="instruments">
+   			<list>
+   				<ref bean="guitar" />
+   				<ref bean="guitar" />
+   				<ref bean="tabla" />
+   			</list>
+   		</property>
+   </bean>
+   
+   <bean id="auid" class="com.akshay.spring.learn.Auditorim" init-method="turnOnLights" destroy-method="turnOffLights" />
+   
+   <bean id="ticket" class="com.akshay.spring.learn.Ticket" scope="prototype" />
+   
+</beans>
