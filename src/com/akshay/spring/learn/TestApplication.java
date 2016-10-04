@@ -43,6 +43,9 @@ public class TestApplication {
 		Performer i5 = (Performer) ctx.getBean("i5");
 		i5.perform();
 		
+		Performer i6 = (Performer) ctx.getBean("i6");
+		i6.perform();
+		
 		
 		Ticket t1 = (Ticket) ctx.getBean("ticket");
 		Ticket t2 = (Ticket) ctx.getBean("ticket");
@@ -50,6 +53,14 @@ public class TestApplication {
 		System.out.println("t1 = "+t1);
 		System.out.println("t2 = "+t2);
 		System.out.println("t1==t2 ? "+(t1==t2));
+		
+		
+		Ticket t3 = (Ticket) ctx.getBean("ticket1");
+		Ticket t4 = (Ticket) ctx.getBean("ticket1");
+		
+		System.out.println("t3 = "+t3);
+		System.out.println("t4 = "+t4);
+		System.out.println("t3==t4 ? "+(t3==t4));
 		
 		ctx.close();
 		System.out.println("Finished application");
