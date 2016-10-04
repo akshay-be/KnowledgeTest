@@ -1,4 +1,4 @@
-package am.pre2round;
+package interview.appmat.pre2round;
 
 public class LoopLinkedList {
 

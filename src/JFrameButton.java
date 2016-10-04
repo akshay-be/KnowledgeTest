@@ -25,6 +25,6 @@ public class JFrameButton extends JFrame
 				// TODO Auto-generated method stub
 				
 			}
-		})
+		});
 	}
 }

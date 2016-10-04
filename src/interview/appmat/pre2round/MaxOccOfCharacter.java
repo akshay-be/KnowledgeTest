@@ -1,4 +1,4 @@
-package am.pre2round;
+package interview.appmat.pre2round;
 
 import java.util.HashMap;
 import java.util.Map;

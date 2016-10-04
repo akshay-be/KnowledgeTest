@@ -27,10 +27,10 @@ public class TestAnimals {
 		
 		TestAnimals t = new TestAnimals();
 		t.getClass();
-		t.
+
 		
 		StackL l = new StackL();
-		l.
+
 	}
 	
 

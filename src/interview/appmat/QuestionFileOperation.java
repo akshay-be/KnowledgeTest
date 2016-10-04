@@ -1,14 +1,16 @@
 package interview.appmat;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 public class QuestionFileOperation {
 
 	/**
 	 * @param args
+	 * @throws FileNotFoundException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		FileInputStream inputfile = new FileInputStream("myfile");
 		FileOutputStream outputFile = new FileOutputStream("myfile");
 	}
@@ -28,4 +30,4 @@ public class QuestionFileOperation {
  * 
  * 
  * *****/
- */
+ 

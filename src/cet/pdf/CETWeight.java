@@ -73,7 +73,7 @@ public class CETWeight {
 						 db.setCandidateName(line.substring(15, 38).trim());
 						 db.setCOURSE(line.substring(40, 57).trim());
 						 db.setRank(line.substring(58, 67).trim());
-						 db.addRank(line.substring(58, 67).trim());
+						// db.addRank(line.substring(58, 67).trim());
 						 db.setCategClaim(line.substring(68, 73).trim());
 						 db.setCategAllot(line.substring(74, 79).trim());
 						 db.setCourseFees(line.substring(79, 91).trim());
