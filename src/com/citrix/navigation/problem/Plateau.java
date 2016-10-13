@@ -1,16 +1,23 @@
 package com.citrix.navigation.problem;
 
+/**
+ * Plateau will be having two coordinates wch indicate lower left and upper right
+ * coordinates.
+ * 
+ * @author AkshayB1
+ * 
+ */
 public class Plateau {
 
-	private Coordinates topRightCoordinates = new Coordinates(0, 0);
-	private Coordinates bottomLeftCoordinates = new Coordinates(0, 0);
+	private Coordinates lowerLeftCoordinates = new Coordinates(0, 0);
+	private Coordinates upperRightCoordinates = null;
 
-	public Plateau(int rightXCoordinate, int rightYCoordinate) {
-		topRightCoordinates = topRightCoordinates.newCoordinatesFor(rightXCoordinate, rightYCoordinate);
+	public Plateau(int xCoordinate, int yCoordinate) {
+		upperRightCoordinates = new Coordinates(xCoordinate, yCoordinate);
 	}
 
 	public boolean isWithinBounds(Coordinates coordinates) {
-		return this.bottomLeftCoordinates.isOutsideBounds(coordinates)
-				&& this.topRightCoordinates.isWithinBounds(coordinates);
+		return this.lowerLeftCoordinates.isOutsideBounds(coordinates)
+				&& this.upperRightCoordinates.isWithinBounds(coordinates);
 	}
 }

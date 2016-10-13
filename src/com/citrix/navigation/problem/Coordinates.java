@@ -30,16 +30,7 @@ public class Coordinates {
 	}
 	
 	
-	/**
-	 * Co-ordinates for specific value.
-	 * @param xCoordinateStepValue
-	 * @param yCoordinateStepValue
-	 * @return
-	 */
-	public Coordinates newCoordinatesFor(int xCoordinateValue, int yCoordinateValue) {
-        return new Coordinates(xCoordinateValue, xCoordinateValue);
-    }
-	
+
 	public boolean isWithinBounds(Coordinates coordinates) {
 		return isXCoordinateWithinBounds(coordinates.xCoordinate)
 				&& isYCoordinateWithinBounds(coordinates.yCoordinate);
@@ -65,7 +56,7 @@ public class Coordinates {
 	private boolean isXCoordinateWithinBounds(int xCoordinate) {
 		return xCoordinate <= this.xCoordinate;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "x=" + xCoordinate + ", y="+ yCoordinate;
