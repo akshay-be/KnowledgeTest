@@ -34,8 +34,6 @@ public abstract class Formula {
      * Conjunctive Normal Form.
      *
      * @return    this Formula in Conjunctive Normal Form.
-     * @exception CheckerException If this formula is not in NNF or if it
-     *            still contains any implications.
      */
     abstract public Formula nnfToCnf();
 
@@ -68,8 +66,6 @@ public abstract class Formula {
     /** Returns a textual description of this Formula.
      *
      * This is used for pretty printing, when either of the 
-     * checker.Checker.DEBUG or 
-     * checker.Checker.PARSE_DEBUG switches are turned on.
      *
      * @return the textual representation.
      *

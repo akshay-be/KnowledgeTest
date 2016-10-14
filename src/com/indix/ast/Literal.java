@@ -2,7 +2,7 @@ package com.indix.ast;
 
 import java.util.Vector;
 
-/** Superclass for <i>literal</i> Formulas - those that are not 
+/** Superclass for literal Formulas - those that are not 
  * connectives.
  *
  * @author  Akshay BE
