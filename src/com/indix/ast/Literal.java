@@ -6,11 +6,7 @@ import java.util.Vector;
  * connectives.
  *
  * @author  Akshay BE
- * @version 1.0
  *
- * @see     Atom
- * @see     True
- * @see     False
  */ 
 public abstract class Literal extends Formula {
 	public Formula toNnf() {

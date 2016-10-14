@@ -38,9 +38,7 @@ public class Parser {
 	/**
 	 * Operator-precedence table.
 	 * 
-	 * S stands for shift, R for reduce and E for errors.
-	 * 
-	 * @see #parse()
+	 * S stands for shift, R for reduce and E for errors. in parse()
 	 */
 	private static final int[][] o_p_table = {
 	/* ----------------------input token--------------------- */

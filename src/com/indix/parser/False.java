@@ -3,7 +3,6 @@ package com.indix.parser;
 /** Specifies False Tokens.
  *
  * @author  Akshay BE
- * @version 1.0
  */
 class False extends Val {
 

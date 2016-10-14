@@ -5,8 +5,6 @@ import java.util.Vector;
 /** Specifies OR connectives.
  *
  * @author  Akshay BE
- * @author  Your Name
- * @version 1.0
  */
 public final class OR extends Formula {
 

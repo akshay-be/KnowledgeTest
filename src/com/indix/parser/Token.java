@@ -5,7 +5,6 @@ package com.indix.parser;
  * Parser.
  *
  * @author  Akshay BE
- * @version 1.0
  *
  */
 abstract public class Token {

@@ -3,7 +3,6 @@ package com.indix.ast;
 /** Specifies the TT Literal.
  *
  * @author  Akshay BE
- * @version 1.0
  */
 public final class True extends Literal {
 

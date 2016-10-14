@@ -9,7 +9,6 @@ import java.util.Vector;
  * contain a Conj at their root.
  * 
  * 
- * @see java.util.Vector
  */
 public final class AND extends Formula {
 

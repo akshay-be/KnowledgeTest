@@ -4,7 +4,6 @@ package com.indix.ast;
  * Specifies the FF Literal.
  * 
  * @author Akshay BE
- * @version 1.0
  */
 public final class False extends Literal {
 

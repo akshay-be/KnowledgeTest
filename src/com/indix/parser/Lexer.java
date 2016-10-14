@@ -8,7 +8,6 @@ import java.io.StringReader;
  * language or Atoms.
  * 
  * @author Akshay BE
- * @version 1.0
  * 
  */
 class Lexer {
@@ -22,7 +21,6 @@ class Lexer {
 	/**
 	 * Current character grabbed from the reader.
 	 * 
-	 * @see #advance()
 	 */
 	private char lex_char;
 

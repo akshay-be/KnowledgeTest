@@ -6,7 +6,6 @@ package com.indix.parser;
  * and connectives.
  *
  * @author  Akshay BE
- * @version 1.0
  *
  */
 abstract class Val extends Token {

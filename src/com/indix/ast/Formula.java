@@ -19,7 +19,6 @@ import java.util.Vector;
  *  Disj(Formula, Formula) 
  * 
  * @author Akshay BE
- * @version 1.0
  * 
  */
 public abstract class Formula {
