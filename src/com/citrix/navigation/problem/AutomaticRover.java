@@ -1,7 +1,6 @@
 package com.citrix.navigation.problem;
 
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 

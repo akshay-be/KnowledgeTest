@@ -25,8 +25,36 @@ public class KthSmallestElementRowAndColumnSorted2DArray {
             nodeArr[i].r = 0;
             nodeArr[i].c = i;
 		}
+		
+		buildHeap(nodeArr, n);
+		
 		return 0;
 	}
+	
+	public static void buildHeap(HeapNode[] arr, int n) {
+        int i = (n -1)/2;
+        while (i >= 0) {
+            minHeapify(arr, i, n);
+            i--;
+        }
+    }
+	
+	
+	public static void minHeapify(HeapNode arr[], int i, int heap_size) {
+        int l = i*2 + 1;
+        int r = i*2 + 2;
+        int smallest = i;
+        if (l < heap_size && arr[l].data < arr[i].data)
+            smallest = l;
+        if (r < heap_size && arr[r].data < arr[smallest].data)
+            smallest = r;
+        if (smallest != i ) {
+            HeapNode tmp = new HeapNode(arr[i]);
+            arr[i] = new HeapNode(arr[smallest]);
+            arr[smallest] = new HeapNode(tmp);
+            minHeapify(arr, smallest, heap_size);
+        }
+    }
 }
 
 
