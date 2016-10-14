@@ -4,33 +4,18 @@ import java.io.IOException;
 import java.io.StringReader;
 
 /**
- * Converts freeform text into Tokens, which represent keywords of the input
+ * Converts text into Tokens, which represent keywords of the input
  * language or Atoms.
- * 
- * Keywords:
- * <ul>
- * <li>TT
- * <li>FF
- * <li>(
- * <li>)
- * <li>NOT
- * <li>AND
- * <li>OR
- * </ul>
  * 
  * @author Akshay BE
  * @version 1.0
  * 
- * @see Token
- * @see Parser
- * @see checker.error.LexicalException
  */
 class Lexer {
 	
 	/**
 	 * Input reader.
 	 * 
-	 * @see #Lexer(StringReader input)
 	 */
 	public  StringReader reader;
 
@@ -46,8 +31,6 @@ class Lexer {
 	 * 
 	 * Will be converted into a checker.parser.Token. by textToToken.
 	 * 
-	 * @see #lex()
-	 * @see #textToToken()
 	 */
 	private String lex_text = null;
 
@@ -56,7 +39,6 @@ class Lexer {
 	 * 
 	 * Set by lex().
 	 * 
-	 * @see #lex()
 	 */
 	private boolean lex_start = true;
 
@@ -65,7 +47,6 @@ class Lexer {
 	 * 
 	 * Set by advance().
 	 * 
-	 * @see #advance()
 	 */
 	private boolean isEol = false;
 
@@ -73,10 +54,6 @@ class Lexer {
 	 * Constructs a new Lexer with StringReader containing characters to be lexed
 	 * into Tokens.
 	 * 
-	 * @param input
-	 *            the InputStream to be lexed.
-	 * 
-	 * @see java.io.StringReader
 	 */
 	Lexer(StringReader str) {
 		reader = str;
@@ -91,12 +68,6 @@ class Lexer {
 	 * its input, so we test whether the next int that's read can be converted
 	 * to a char and use that to set the isEof attribute.
 	 * 
-	 * @exception IOException
-	 *                if there's a problem with the reader.
-	 * 
-	 * @see #isEof
-	 * @see #lex_char
-	 * @see #lex()
 	 */
 	private final void advance() throws IOException {
 		int next_char = reader.read();
@@ -166,15 +137,8 @@ class Lexer {
 	/**
 	 * Converts lex_text into the corresponding Token.
 	 * 
-	 * @return Token corresponding to the contents of lex_text.
-	 * 
-	 * @see #lex_text
-	 * @see #lex()
-	 * @see Token
 	 */
 	private final Token textToToken() {
-
-        
 		if (lex_text.equals("(")) {
 	            return new LParen();
 	        } else if (lex_text.equals(")")) {
@@ -188,7 +152,6 @@ class Lexer {
 	        } else {
 	            return new Atom(lex_text);
 	        }
-
 	}
 
 }

@@ -6,8 +6,7 @@ import java.util.Vector;
  * Superclass of all the types in abstract syntax trees.
  * 
  * Abstract syntax trees - Formulas - are returned by the parser.
- * The private check() method in
- * checker.Checker calls the relevant methods in
+ * The private check() method in Checker calls the relevant methods in
  * Formula to perform a correct tautology check.
  * 
  * 
@@ -18,9 +17,6 @@ import java.util.Vector;
  *  Neg(Formula) 
  *  Conj(Formula, Formula) 
  *  Disj(Formula, Formula) 
- *  Impl(Formula, Formula) 
- *  Iff(Formula, Formula)
- * 
  * 
  * @author Akshay BE
  * @version 1.0
@@ -32,8 +28,6 @@ public abstract class Formula {
     /** Converts this Formula to Negative Normal Form. 
      *
      * @return    this Formula in Negative Normal Form.
-     * @exception CheckerException If this formula still contains any
-     *            implications.
      */
     abstract public Formula toNnf() ;
 
@@ -50,8 +44,6 @@ public abstract class Formula {
      *
      * @return    this Formula in its simplist Conjunctive Normal 
      *            Form.
-     * @exception CheckerException If this formula is not in CNF or if it
-     *            still contains any implications.
      */
     public Formula simplifyCnf()  {
     	return (new AND(this, True.VALUE)).simplifyCnf();
@@ -70,11 +62,7 @@ public abstract class Formula {
      * simplifyCnf() in the Conj class.
      * 
      * @return    this Formula in clausal form.
-     * @exception CheckerException If this formula is not in CNF or if it
-     *            still contains any implications.
      *
-     * @see       Conj#simplifyCnf()
-     * @see       java.util.Vector
      */
     abstract protected Vector toClause();
 
@@ -86,8 +74,6 @@ public abstract class Formula {
      *
      * @return the textual representation.
      *
-     * @see    checker.Checker#DEBUG
-     * @see    checker.Checker#PARSE_DEBUG
      */
     abstract public String toString();
 

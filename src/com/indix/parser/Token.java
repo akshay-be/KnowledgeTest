@@ -42,9 +42,6 @@ abstract public class Token {
      *
      * @return a string representing the object type.
      *
-     * @see    checker.Checker#PARSE_DEBUG
-     * @see    checker.parser.Lexer
-     * @see    checker.parser.Parser
      */
     abstract public String toString();
 }

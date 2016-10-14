@@ -8,9 +8,6 @@ import java.util.Vector;
  * The bulk of the simplifyCnf() algorithm resides here, since all CNF Formulas
  * contain a Conj at their root.
  * 
- * @author Akshay BE
- * @author Your Name
- * @version 1.0
  * 
  * @see java.util.Vector
  */
@@ -66,30 +63,6 @@ public final class AND extends Formula {
 	/**
 	 * Simplifies this CNF Formula.
 	 * 
-	 * Applies the following transformations to this Formula:
-	 * &nbsp&nbsp&nbsp&nbsp P OR NOT P == TRUE &nbsp&nbsp&nbsp&nbsp P AND (P OR
-	 * Q) == P &nbsp&nbsp&nbsp&nbsp (P OR Q) AND (NOT P OR Q) == Q.
-	 * 
-	 * In order to simplify the transformations, Formulas are temporarily
-	 * converted into <i>clausal</i> form. This is a list of conjunctions, where
-	 * each conjunction is a list of disjunctions. For example, the Formula:
-	 * 
-	 * (L11 OR L12 OR ...) AND (L21 OR L22 OR ...) AND (L31 OR L32 OR...)
-	 * 
-	 * is represented by the following clause:
-	 * 
-	 * [[L11, L12, ...], [L21, L22, ...], [L31, L32, ...], ...]
-	 * 
-	 * Here, clausal forms are implemented as a Vector of Vectors.
-	 * 
-	 * @exception CheckerException
-	 *                if this Formula is not in CNF, or if it contains an
-	 *                implication.
-	 * 
-	 * @see #toClause()
-	 * @see #fromClause(Vector clausal)
-	 * @see #isSubset(Vector v1, Vector v2)
-	 * @see java.util.Vector
 	 */
 	public Formula simplifyCnf() {
 		Vector clausal = this.toClause();
@@ -139,8 +112,6 @@ public final class AND extends Formula {
 	 *            a possible superset of v1
 	 * @return true if v1 is a subset of v2.
 	 * 
-	 * @see #simplifyCnf()
-	 * @see java.util.Vector
 	 */
 	private static boolean isSubset(Vector v1, Vector v2) {
 		for (int i = 0; i < v1.size(); i++) {
@@ -160,8 +131,6 @@ public final class AND extends Formula {
 	 *            a Formula in its clausal form.
 	 * @return the abstract syntax tree representation of clausal.
 	 * 
-	 * @see #simplifyCnf()
-	 * @see java.util.Vector
 	 */
 	private static Formula fromClause(Vector clausal) {
 		Formula conj = True.VALUE;

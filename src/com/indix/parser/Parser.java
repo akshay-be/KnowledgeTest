@@ -14,28 +14,6 @@ import com.indix.ast.Variable;
  * Parses Tokens, representing keywords and values in the input language into an
  * abstract syntax tree, or Formula.
  * 
- * Input language:
- * 
- * 
- * Prop ::= | ( Prop ) | NOT Prop | Prop AND Prop | Prop OR Prop
- * 
- * 
- * 
- * Abstract syntax tree grammar:
- * 
- * 
- * Formula ::= Atom(String) | Neg(Formula) | Conj(Formula, Formula) |
- * Disj(Formula, Formula)
- * 
- * 
- * @author Akshay BE
- * @version 1.0
- * 
- * @see Lexer
- * @see Token
- * @see checker.error.SyntacticException
- * @see checker.ast.Formula
- * @see java.util.Stack
  */
 public class Parser {
 	private static Lexer lexer;

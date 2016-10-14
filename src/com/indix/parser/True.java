@@ -1,7 +1,7 @@
 package com.indix.parser;
 
 /**
- * Specifies <code>TT</code> <code>Token</code>s.
+ * Specifies true Tokens.
  * 
  * @author Akshay BE
  * @version 1.0

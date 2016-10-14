@@ -1,6 +1,6 @@
 package com.indix.parser;
 
-/** Specifies <code>FF</code> <code>Token</code>s.
+/** Specifies False Tokens.
  *
  * @author  Akshay BE
  * @version 1.0
