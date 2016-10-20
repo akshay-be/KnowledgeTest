@@ -1,6 +1,7 @@
 package com.amazon;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 
 public class MaximumOfAllSubarrays {
 
@@ -9,11 +10,14 @@ public class MaximumOfAllSubarrays {
 		//Out put : 3 3 4 5 5 5 6
 		//System.out.println("Input : "+array);
 		//maximumOfAllSubarrays(array,3);
+		System.out.println("Input : "+Arrays.toString(array));
+		System.out.print("Output : ");
 		maximumOfAllSubArrayUsingQueue(array,3);
 		
 		
 		int array1[] = {8, 5, 10, 7, 9, 4, 15, 12, 90, 13};
-		//System.out.println("Input : "+array1);
+		System.out.println("Input : "+Arrays.toString(array1));
+		System.out.print("Output : ");
 		//maximumOfAllSubarrays(array1,4);
 		maximumOfAllSubArrayUsingQueue(array1,4);
 		
@@ -35,37 +39,36 @@ public class MaximumOfAllSubarrays {
 	}
 
 	
-	public static void maximumOfAllSubArrayUsingQueue(int[] a,int k){
-		
-		ArrayDeque<Integer> Q=new ArrayDeque<Integer>();
+	public static void maximumOfAllSubArrayUsingQueue(int[] a, int k) {
+
+		ArrayDeque<Integer> queue = new ArrayDeque<Integer>();
 		int i = 0;
-		for ( i = 0; i < k ; i++ )
-
+		for (i = 0; i < k; i++)
 		{
-
-			while ( !Q.isEmpty()  &&  a[i] >= a[Q.size() - 1 ] ){
-				int d =Q.pollLast(); 
-				System.out.println(" d : "+d);
+			while (!queue.isEmpty() && a[i] >= a[queue.size() - 1]) {
+				int d = queue.pollLast();
+				//System.out.println(" d : " + d);
 			}
-                        // Remove from rear
+			// Remove from rear
 			// Add new element at rear of queue
-			Q.add(i);
+			queue.add(i);
 		}
 
 		// Process rest of the elements, i.e., from a[k] to a[n-1]
 
-		for ( ; i < a.length ; ++i )
-		{
-			System.out.print ( a [ Q.peek() ] + " " ) ;
-			while ( !Q.isEmpty() && Q.peek() <=  i-k )
-				Q.pop();
+		for (; i < a.length; ++i) {
+			System.out.print(a[queue.peek()] + " ");
+			while (!queue.isEmpty() && queue.peek() <= i - k)
+				queue.pop();
 
-			while ( !Q.isEmpty()  &&  a[i] >= a [ Q.peekLast() ] )
-				Q.pollLast();
+			while (!queue.isEmpty() && a[i] >= a[queue.peekLast()])
+				queue.pollLast();
 			// Add current element at the rear of Q
-			Q.add(i);
+			queue.add(i);
 		}
 		// Print the maximum element of last window
-		System.out.print ( a [ Q.peek()] + " " ) ;	
+		System.out.print(a[queue.peek()] + " ");
+	
+		System.out.println();
 	}
 }
