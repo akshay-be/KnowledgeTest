@@ -26,7 +26,9 @@ public interface VersionInfoInterface {
 	/** API to provide the build hash */
 	public String getModuleBuildHash();
 	
+	public boolean isPrimaryFEP();
+	
 	/** API to provide the sub module version info associated with module.*/
-	public List<VersionInfoInterface> getSubModuleVersionInfo();
+	public List<VersionInfoInterface> getSubModulesVersionInfo();
 
 }

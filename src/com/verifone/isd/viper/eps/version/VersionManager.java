@@ -1,5 +1,5 @@
 /*
- * Created on April 4, 2016 
+ * Created on April 14, 2016 
  * Author: akshayb1
  * Verifone Inc., Copyright(c) 2016 All rights reserved
  */
@@ -8,6 +8,7 @@ package com.verifone.isd.viper.eps.version;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
@@ -29,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * VersionManager is singleton class For managing the version info details. It
  * provides utility APIs to read,register and unregister version details of
- * module. It provides APSs to read the registered module version details and sub
+ * module. It provides APIs to read the registered module version details and sub
  * module version details.
  * 
  * @author AkshayB1
@@ -39,20 +41,28 @@ public class VersionManager {
 
 	private static final Logger log = LoggerFactory.getLogger(VersionManager.class.getName());
 	private static volatile VersionManager theInstance = new VersionManager();
-	private  Map<String,VersionInfo> versionInfoMap = new ConcurrentHashMap<String,VersionInfo>();
+	private  Map<String,VersionInfo> registredModuleversionInfoMap = new ConcurrentHashMap<String,VersionInfo>();
+	private  Map<String,VersionInfo> avilableModuleVersionInfoMap = new ConcurrentHashMap<String,VersionInfo>();
 	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 	private final Lock readLock = readWriteLock.readLock();
 	private final Lock writeLock = readWriteLock.writeLock();
+	
+	/** Lock object for data change listener operations like add/remove/notify  */
+	private final Lock lockDataChangeListener = new ReentrantLock();
 
-	static{
-		org.apache.log4j.BasicConfigurator.configure();
-	}
+	/** Map to contain the VersionChangeListener objects. */
+	private Map<String, VersionChangeListener> dataChangeListeners = new HashMap<String, VersionChangeListener>();
 	
 	/**
 	 * A private Constructor prevents any other class from instantiating.
 	 */
-	private VersionManager(){
-		
+	private VersionManager() {
+		try {
+			VersionMangerUtil.notifyRCIToRegisterVersion();
+			VersionMangerUtil.notifyWebToRegisterVersion();
+		} catch (Exception e) {
+			log.error("Error in notifying....", e);
+		}
 	}
 	
 	/**
@@ -73,8 +83,8 @@ public class VersionManager {
 		VersionInfoInterface vInfo = null;
 		readLock.lock();
 		try{
-			if(versionInfoMap.containsKey(moduleName)){
-				vInfo = versionInfoMap.get(moduleName);
+			if(registredModuleversionInfoMap.containsKey(moduleName)){
+				vInfo = registredModuleversionInfoMap.get(moduleName);
 				if(vInfo!=null){
 					/** Doing deep copy of version info object */
 					vInfo = new VersionInfo(vInfo);
@@ -98,8 +108,8 @@ public class VersionManager {
 		Map<String,String> dataMap = new HashMap<String, String>();
 		readLock.lock();
 		try{
-			if(versionInfoMap.containsKey(moduleName)){
-				VersionInfoInterface vInfo = versionInfoMap.get(moduleName);
+			if(registredModuleversionInfoMap.containsKey(moduleName)){
+				VersionInfoInterface vInfo = registredModuleversionInfoMap.get(moduleName);
 				/**
 				 * If the value is not null or not empty then only details will
 				 * be added to map. Module name and module version cannot be
@@ -125,73 +135,7 @@ public class VersionManager {
 		return dataMap;
 	}
 	
-	/**
-	 * API to provide all the sub module version details for the specified module.
-	 * @param moduleName - Name of a module.
-	 * @return list of sub module version details
-	 */
-	public  List<VersionInfoInterface> getRegisteredModuleSubModulesVersionInfo(String moduleName){
-		List<VersionInfoInterface> listSubVersionInfo = new ArrayList<VersionInfoInterface>();
-		readLock.lock();
-		try{
-			if(versionInfoMap.containsKey(moduleName)){
-				List<VersionInfoInterface> originalList = versionInfoMap.get(moduleName).getSubModuleVersionInfo();
-				if(originalList!=null){
-					/**
-					 * Doing the deep copy of sub module version objects.
-					 */
-					for (VersionInfoInterface versionInfoInterface : originalList) {
-						if(versionInfoInterface!=null){
-							listSubVersionInfo.add(new VersionInfo(versionInfoInterface));
-						}
-					}
-					/** Below code can be used if only shallow copy is required. */
-					//listSubVersionInfo = new ArrayList<VersionInfoInterface>(originalList);
-				}
-			}
-			listSubVersionInfo = Collections.unmodifiableList(listSubVersionInfo);
-		}
-		finally{
-			readLock.unlock();
-		}
-		return listSubVersionInfo;
-	}
 	
-	/**
-	 * API to provide all the sub module version details in HashMap representation.
-	 * Outer HashMap - Key sub module name, Value subversion details.
-	 * Inner HashMap - Key will be attribute(name,version,build time, build hash) and value will be value of attribute.
-	 * @param moduleName - Name of module.
-	 * @return map of subversion details.
-	 */
-	public  Map<String,Map<String,String>> getRegisteredModuleSubModulesVersionInfoMap(String moduleName){
-		Map<String,Map<String,String>> dataMap = new HashMap<String, Map<String,String>>();
-		readLock.lock();
-		try{
-			if(versionInfoMap.containsKey(moduleName)){
-				List<VersionInfoInterface> subModuleVersionInfoList = versionInfoMap.get(moduleName).getSubModuleVersionInfo();
-				for (VersionInfoInterface versionInfoInterface : subModuleVersionInfoList) {
-					Map<String,String> subModuleDataMap = new HashMap<String, String>();
-					String name = versionInfoInterface.getModuleName();
-					String version = versionInfoInterface.getModuleVersion();
-					String buildTime = versionInfoInterface.getModuleBuildTime();
-					String buildHash = versionInfoInterface.getModuleBuildHash();
-					if(name!=null && name.trim().isEmpty()){
-						subModuleDataMap.put(VersionManagerConstants.MODULE_NAME, name);
-						subModuleDataMap.put(VersionManagerConstants.MODULE_VERSION, version);
-						subModuleDataMap.put(VersionManagerConstants.MODULE_BUILD_TIME, buildTime);
-						subModuleDataMap.put(VersionManagerConstants.MODULE_HASH, buildHash);
-						dataMap.put(versionInfoInterface.getModuleName(), subModuleDataMap);
-					}
-					
-				}
-			}
-			Collections.unmodifiableMap(dataMap);
-		}finally{
-			readLock.unlock();
-		}
-		return dataMap;
-	}
 	
 	/**
 	 * API to obtain all registered module version info details in list of
@@ -203,12 +147,12 @@ public class VersionManager {
 		List<VersionInfoInterface> listVersionInfo = new ArrayList<VersionInfoInterface>();
 		readLock.lock();
 		try{
-			List<VersionInfo> originalList = (List<VersionInfo>) versionInfoMap.values();
+			Collection<VersionInfo> originalList = registredModuleversionInfoMap.values();
 			if(originalList!=null){
 				 /** Doing deep copy of version info details. */
-				for (VersionInfoInterface versionInfoInterface : originalList) {
-					if(versionInfoInterface!=null){
-						listVersionInfo.add(new VersionInfo(versionInfoInterface));
+				for (VersionInfo versionInfo : originalList) {
+					if(versionInfo!=null && versionInfo instanceof VersionInfoInterface){
+						listVersionInfo.add(new VersionInfo(versionInfo));
 					}
 				}
 			}
@@ -223,13 +167,18 @@ public class VersionManager {
 	 * API to provide all the  module version details in HashMap representation.
 	 * Outer HashMap - Key sub module name, Value version details.
 	 * Inner HashMap - Key will be attribute(name,version,build time, build hash) and value will be value of attribute. 
-	 * @return
+	 * @return Map of module version info.
+	 * Ex : { Viper Core={Module-Name=Viper Core, Module-Version=1.01.00, Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 * 		  Viper Loyalty={Module-Name=Viper Loyalty, Module-Version=1.01.01, Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash2},
+	 *  	  Viper Incomm={Module-Name=Viper Incomm, Module-Version=1.01.02, Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash3},
+	 *  	  Viper FSA={Module-Name=Viper FSA, Module-Version=1.01.03, Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash4}
+	 * 		}
 	 */
 	public  Map<String,Map<String,String>> getAllRegisteredModuleVersionInfoMap(){
 		Map<String,Map<String,String>> dataMap = new HashMap<String, Map<String,String>>();
 		readLock.lock();
 		try{
-			for(Entry<String, VersionInfo> entry : versionInfoMap.entrySet()){
+			for(Entry<String, VersionInfo> entry : registredModuleversionInfoMap.entrySet()){
 	            String moduleName = entry.getKey();
 	            Map<String,String> innerDataMap = getRegisteredModuleVersionInfoMap(moduleName);
 	            dataMap.put(moduleName, innerDataMap);
@@ -277,12 +226,12 @@ public class VersionManager {
 			if(versionInfo!=null){
 				String moduleName = versionInfo.getModuleName();
 				String moduleVersion = versionInfo.getModuleVersion();
-				boolean legalVersion = validateVesrion(moduleVersion);
+				boolean legalVersion = validateVersion(moduleVersion);
 				log.info(moduleName+" invoked registerModule API of Version Manager for Version : "+moduleVersion);
 				if (null != moduleName && legalVersion) {
-					if (versionInfoMap.containsKey(moduleName)) {
+					if (registredModuleversionInfoMap.containsKey(moduleName)) {
 						log.info(moduleName+" module was registerd already.");
-						VersionInfo existingVersionInfo = versionInfoMap.get(moduleName);
+						VersionInfo existingVersionInfo = registredModuleversionInfoMap.get(moduleName);
 						String existingModuleVersion = existingVersionInfo.getModuleVersion();
 						if(existingModuleVersion.equals(moduleVersion)){
 							existingVersionInfo.incrementReferenceCount();
@@ -295,8 +244,19 @@ public class VersionManager {
 						 * This situation will not occur as per the design discussion is made.
 						 */
 					}
-					versionInfoMap.put(moduleName, versionInfo);
-					log.debug("Module " + moduleName+" with vesrion "+moduleVersion+" registred wirh VersionManager");
+					registredModuleversionInfoMap.put(moduleName, versionInfo);
+					log.info("Module " + moduleName+" with vesrion "+moduleVersion+" registred wirh VersionManager");
+					/** Notify all listeners for version change. */
+					notifyUpdatedVersionDetails();
+					
+					/**
+					 * Check if the module is not in available module list then add to it.
+					 */
+					if(!avilableModuleVersionInfoMap.containsKey(moduleName)){
+						avilableModuleVersionInfoMap.put(moduleName, versionInfo);
+						log.info("Module " + moduleName+" with vesrion "+moduleVersion+" added to avilable module list.");
+					}
+
 					updateStatus = Boolean.TRUE;
 				}else{
 					log.warn("Invalid version details, Module not registred.");
@@ -317,9 +277,10 @@ public class VersionManager {
 	 * @param version
 	 * @return
 	 */
-	private final boolean validateVesrion(String version){
+	private final boolean validateVersion(String version){
 		Boolean validationStatus= Boolean.FALSE;
-		if(version!=null && version.length()>5 && version.length()<=8){
+		if(version!=null && version.length()>=VersionManagerConstants.VERSION_MIN_LENGTH 
+				&& version.length()<=VersionManagerConstants.VERSION_MAX_LENGTH){
 			validationStatus = version.matches(VersionManagerConstants.VERSION_REGEX);
 		}
 		log.debug(version+" validation status : "+validationStatus);
@@ -366,7 +327,7 @@ public class VersionManager {
 	 */
 	public  boolean unRegisterModule(VersionInfoInterface versionInfo){
 		if(versionInfo!=null){
-			return unRegisterVersion(versionInfo.getModuleName());
+			return unRegisterModule(versionInfo.getModuleName());
 		}else{
 			log.warn("VersionInfo object can't be null for unregister.");
 			return false;
@@ -379,13 +340,13 @@ public class VersionManager {
 	 * @param moduleName name of module need to unregister.
 	 * @return unRegister status. True for success and false for failure.
 	 */
-	public  boolean unRegisterVersion(String moduleName){
+	public  boolean unRegisterModule(String moduleName){
 		writeLock.lock();
 		Boolean unRegisterStatus =Boolean.FALSE;
 		try{
 		log.info("unRegister is invoked for module : "+moduleName);
 		if (moduleName!=null) {
-			if (versionInfoMap.containsKey(moduleName)) {
+			if (registredModuleversionInfoMap.containsKey(moduleName)) {
 					/**
 					 * The reference count will be more than or equal 1. It will
 					 * be more than one in case of 2 or more instance of module
@@ -398,7 +359,7 @@ public class VersionManager {
 					 * the version info object for the module will be removed
 					 * from HashMap.
 					 */
-				VersionInfo existingVersionInfo = versionInfoMap.get(moduleName);
+				VersionInfo existingVersionInfo = registredModuleversionInfoMap.get(moduleName);
 				int referenceCount = existingVersionInfo.getModulesReferenceCount();
 				log.info("Version info reference count : "+referenceCount);
 				if(referenceCount>1){
@@ -406,10 +367,10 @@ public class VersionManager {
 					log.info("Version info reference count is decremented by 1 ");
 					
 				}else{
-					versionInfoMap.remove(moduleName);
+					registredModuleversionInfoMap.remove(moduleName);
 					log.info(moduleName+"Module Un-registerd with VersionManager and removed version info data");
 				}
-				
+				notifyUpdatedVersionDetails();
 				unRegisterStatus= Boolean.TRUE;
 			}
 		}
@@ -427,15 +388,16 @@ public class VersionManager {
 	 * @throws VersionReadException
 	 */
 	public VersionInfoInterface getVersionInfo(Class moduleClass) throws VersionReadException {
+		log.info("Loading version info for "+moduleClass.getName());
 		Enumeration<URL> resources;
 		VersionInfoInterface vInfo = null;
 		try {
 			resources = VersionManager.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
 			while (resources.hasMoreElements()) {
 				URL url = resources.nextElement();
-				log.info("URL : "+url);
+				log.debug("URL : "+url);
 				String moduleJarName = moduleClass.getProtectionDomain().getCodeSource().getLocation().getFile(); 
-				log.info("Jar name : "+moduleJarName);
+				log.debug("Jar name : "+moduleJarName);
 				if(url.getFile().contains(moduleJarName)){
 					Manifest manifest = new Manifest(url.openStream());
 					Attributes attributes = manifest.getMainAttributes();
@@ -447,6 +409,7 @@ public class VersionManager {
 					 * be merged to module version object
 					 */
 					Map<String,VersionInfo> mapData = new HashMap<String, VersionInfo>();
+					boolean isPrimaryFEP = false;
 					for (Object object : keys) {
 						if(object!=null && object instanceof Name){
 							String name = object.toString();
@@ -492,6 +455,8 @@ public class VersionManager {
 									log.warn(name+" property not updated to VersionInfo object.");
 								}
 								mapData.put(key.toLowerCase(), versionInfo);
+							}else if(name!=null && !name.trim().isEmpty() && VersionManagerConstants.PrimaryFEP.toLowerCase().equals(name.trim().toLowerCase())){
+								isPrimaryFEP = Boolean.valueOf(value);
 							}else{
 								log.warn(name+" property not updated to VersionInfo object.");
 							}
@@ -523,21 +488,26 @@ public class VersionManager {
 								}
 					        }
 							mainObject.setSubModuleVersionInfo(subModuleVersionList);
+							mainObject.setPrimaryFEP(isPrimaryFEP);
 							vInfo = (VersionInfoInterface) mainObject;
 						}else{
+							log.warn("Module name or Module version is not correct.");
 							throw new VersionReadException("Module name or Module version is not correct.");
 						}
 					}
 				}
 			}
 		} catch (IOException e) {
+			log.warn("IOException in reading version");
 			throw new VersionReadException("IOException in reading version");
 		}catch (Exception ie) {
+			log.warn("Exception in reading version");
 			throw new VersionReadException("Exception in reading version");
 		}
 		if(vInfo!=null){
 			return vInfo;
 		}else{
+			log.warn("Not found version file for specified jar.");
 			throw new VersionReadException("Not found version file for specified jar.");
 		}
 	}
@@ -557,4 +527,280 @@ public class VersionManager {
 		return registerModule(vInfo);
 	}	
 	
+	/**
+	 * This API to notify all registered version change listener. Version change
+	 * will be notified whenever change version details in version manager.
+	 */
+	private void notifyUpdatedVersionDetails() {
+		try  {
+			/**
+			 * First the lock is acquired on data change Listener to not allow
+			 * add or remove Listener while notifying.
+			 */
+			lockDataChangeListener.lock();
+			try {
+				/**
+				 * The write Lock is acquired on version data because should not
+				 * allow any write and read operation to maintain the data
+				 * should atomic across read version and notify version
+				 **/
+				writeLock.lock();
+				log.debug("Notifying version change.");
+				for (Entry<String, VersionChangeListener> entry : dataChangeListeners.entrySet()) {
+					log.info("Calling data change listner : " + entry.getKey());
+					VersionChangeListener listner = entry.getValue();
+					try{
+						listner.versionDetailsUpdated(getAllRegisteredModuleVersionInfo());
+					}catch(Exception e){
+						/**
+						 * Catching generic exception for not blocking version
+						 * manager activity or notify activities.
+						 */
+						log.error("Error after notifying version data change Listner :  "+entry.getKey(),e);
+					}
+				}
+			}finally{
+				writeLock.unlock();
+			}
+		}finally{
+			lockDataChangeListener.unlock();
+		}
+	}
+
+	/**
+	 * API for register for the version change details notification.
+	 * @param listnerName -  name of listener.
+	 * @param listner - Object to notify version change.
+	 * @return
+	 */
+	public boolean registerDataChangeListener(String listnerName,
+			VersionChangeListener listner) {
+		try  {
+			/** Acquire the data change listener lock before add a listeners. */
+			lockDataChangeListener.lock();
+			/** The listener name should not be null and already should not be Registered. */
+			if (listnerName != null && listner != null
+					&& !dataChangeListeners.containsKey(listnerName)) {
+				dataChangeListeners.put(listnerName, listner);
+				log.info("VersionChangeListener registerd with name : "+ listnerName);
+				return true;
+			}
+		}finally{
+			lockDataChangeListener.unlock();
+		}
+
+		return false;
+	}
+
+	/**
+	 * API for de-register the version change notification.
+	 * @param listnerName - name of the listener to be removed.
+	 * @return
+	 */
+	public boolean removeDataChangeListener(String listnerName) {
+		try  {
+			/** Acquire the data change listener lock before remove a listeners. */
+			lockDataChangeListener.lock();
+			if (listnerName != null && dataChangeListeners.containsKey(listnerName)) {
+				dataChangeListeners.remove(listnerName);
+				log.info(listnerName+" VersionChangeListener de-registerd.");
+				return true;
+			}
+		}finally{
+			lockDataChangeListener.unlock();
+		}
+		return false;
+	}
+	
+	
+	/**
+	 * API to read Version info details from MANIFEST.MF file from META-INF/MANIFEST.MF location.
+	 * @param moduleClass Should be the class of the specific jar belongs.
+	 * @throws VersionReadException
+	 */
+	public void loadAllAvilabeleViperVersionInfo()  {
+		log.info("Loading all avilabe viper version info deatils");
+		Enumeration<URL> resources;
+		VersionInfoInterface vInfo = null;
+		try {
+			resources = VersionManager.class.getClassLoader().getResources("META-INF/MANIFEST.MF");
+			while (resources.hasMoreElements()) {
+				try {
+				URL url = resources.nextElement();
+				log.debug("URL : "+url);
+					Manifest manifest = new Manifest(url.openStream());
+					Attributes attributes = manifest.getMainAttributes();
+					Set<Object>  keys = attributes.keySet();
+					/**
+					 * Creating hashMap all the version details irrespective of
+					 * module or sub module by reading all the entries of
+					 * MANIFEST file. later the sub module version object will
+					 * be merged to module version object
+					 */
+					Map<String,VersionInfo> mapData = new HashMap<String, VersionInfo>();
+					boolean isPrimaryFEP = false;
+					boolean isViperModule = false;
+					boolean isViperDemonModule = false;
+					for (Object object : keys) {
+						if(object!=null && object instanceof Name){
+							String name = object.toString();
+							String value = attributes.getValue((Name)object);
+							if(name!=null && !name.trim().isEmpty()){
+								if(name.contains("-") && name.toLowerCase().contains(VersionManagerConstants.MODULE.toLowerCase()) 
+										&& value!=null && !value.isEmpty()){
+									VersionInfo versionInfo = null;
+									/**
+									 * Key will be the starting of the attribute till the dash symbol The naming convention
+									 * will be used in generating version details will be Module-name. 
+									 * Example : 
+									 * 		Module-Name: Core Viper
+									 * 		Module-Version: 1.1.1
+									 * 		Module-Build-Time: YYYY-MM-DD HH:MM:SS
+									 * 		Module-Hash: some random hash
+									 * 		SubModule1-Name: Viper Library 
+									 * 		SubModule1-Version: 1.1.2
+									 * 		SubModule2-Name: Viper Agent
+									 * 		SubModule2-Version: 1.1.3
+									 * 		Note: sub module can also have different build time and hash.
+									 * 
+									 * The keys in the hashMap will be Module,SubModule1 & SubModule2.
+									 */
+									String key = name.trim().substring(0,name.indexOf("-")).toLowerCase();
+																	
+									if(mapData.containsKey(key)){
+										log.debug("Picked avilable  VersionInfo object from HashMap ");
+										versionInfo = mapData.get(key);
+									}else{
+										log.debug("Created new VersionInfo object ");
+										versionInfo = new VersionInfo();
+									}
+									
+									if(name.toLowerCase().endsWith(VersionManagerConstants.NAME.toLowerCase())){
+										versionInfo.setModuleName(value);
+									} else if(name.toLowerCase().endsWith(VersionManagerConstants.VERSION.toLowerCase())){
+										versionInfo.setModuleVersion(value);
+									}else if(name.toLowerCase().endsWith(VersionManagerConstants.BUILD_TIME.toLowerCase())){
+										versionInfo.setModuleBuildTime(value);
+									}else if(name.toLowerCase().endsWith(VersionManagerConstants.HASH.toLowerCase())){
+										versionInfo.setModuleBuildHash(value);
+									} else{
+										log.warn(name+" property not updated to VersionInfo object.");
+									}
+									mapData.put(key.toLowerCase(), versionInfo);
+								}else if(VersionManagerConstants.PrimaryFEP.toLowerCase().equals(name.trim().toLowerCase())){
+									isPrimaryFEP = Boolean.valueOf(value);
+								}else if(VersionManagerConstants.ViperModule.toLowerCase().equals(name.trim().toLowerCase())){
+									isViperModule = Boolean.valueOf(value);
+								}else if(VersionManagerConstants.ViperDemonModule.toLowerCase().equals(name.trim().toLowerCase())){
+									isViperDemonModule = Boolean.valueOf(value);
+								}else{
+									log.warn(name+" property not updated to VersionInfo object.");
+								}
+							}
+						}
+					}
+					if(!mapData.isEmpty()){
+						VersionInfo mainObject = mapData.get(VersionManagerConstants.MODULE.toLowerCase());
+						/** The key with the Name Module will be the main object of version details.
+						 * 	After retrieving the main object the same will be removed from hashmap
+						 *  And all other version objects will be added as sub module details. */
+						mapData.remove(VersionManagerConstants.MODULE.toLowerCase());
+						String moduleName = mainObject.getModuleName();
+						String moduleVersion = mainObject.getModuleVersion();
+						/** Module name and module version should be mandatory if not available 
+						 *  then should be treat as invalid details for the module and 
+						 *  module will be notified by throwing exception  */
+						if(moduleName!=null && !moduleName.trim().isEmpty()
+								&& moduleVersion!=null && !moduleVersion.trim().isEmpty()){
+							List<VersionInfoInterface> subModuleVersionList = new ArrayList<VersionInfoInterface>();
+							for(Entry<String, VersionInfo> entry : mapData.entrySet()){
+								VersionInfo subModule = entry.getValue();
+								String subModuleName = subModule.getModuleName();
+								String subModuleVersion = subModule.getModuleVersion();
+								if(subModuleName!=null && !subModuleName.trim().isEmpty()
+										&& subModuleVersion!=null && !subModuleVersion.trim().isEmpty()){
+									subModuleVersionList.add((VersionInfoInterface)subModule);
+								}else{
+									log.warn("Ignored sub module version details. SubModule name : "+subModuleName+", Vesrsion : "+subModuleVersion);
+								}
+					        }
+							mainObject.setSubModuleVersionInfo(subModuleVersionList);
+							mainObject.setPrimaryFEP(isPrimaryFEP);
+							vInfo = (VersionInfoInterface) mainObject;
+							if(isViperModule && !avilableModuleVersionInfoMap.containsKey(moduleName)){
+								log.info("Module Added to avilable module list : "+moduleName);
+								avilableModuleVersionInfoMap.put(moduleName, (VersionInfo) vInfo);
+							}
+							if(isViperDemonModule && !registredModuleversionInfoMap.containsKey(moduleName)){
+								boolean isRegistred = registerModule(vInfo);
+								log.info(moduleName+" registerd status "+isRegistred);
+							}
+						}
+					}else{
+						
+					}
+			} catch (IOException e) {
+				log.warn("IOException in reading version");
+			}
+			}
+		} catch (IOException e) {
+			log.warn("IOException in reading version");
+		}
+	}
+	
+	/**
+	 * API to obtain all available(registered/Notregistered) module version info details in list of
+	 * VersionInfoInterface object. Here the Deep copy of objects are returned.
+	 * 
+	 * @return list of VersionInfoInterface objects.
+	 */
+	public  List<VersionInfoInterface> getAllAvailableModuleVersionInfo(){
+		List<VersionInfoInterface> listVersionInfo = new ArrayList<VersionInfoInterface>();
+		readLock.lock();
+		try{
+			Collection<VersionInfo> originalList = avilableModuleVersionInfoMap.values();
+			if(originalList!=null){
+				 /** Doing deep copy of version info details. */
+				for (VersionInfo versionInfo : originalList) {
+					if(versionInfo!=null && versionInfo instanceof VersionInfoInterface){
+						listVersionInfo.add(new VersionInfo(versionInfo));
+					}
+				}
+			}
+			Collections.unmodifiableList(listVersionInfo);
+		}finally{
+			readLock.unlock();
+		}
+		return listVersionInfo;  
+	}
+	
+	/**
+	 * API to return all Available module names.
+	 * @return
+	 */
+	public  Set<String> getAllAvailableModuleNames(){
+		Set<String> listModuleNames = null;
+		readLock.lock();
+		try{
+			listModuleNames = avilableModuleVersionInfoMap.keySet();
+		}finally{
+			readLock.unlock();
+		}
+		return listModuleNames;
+	}
+	
+	/**
+	 * API to return all registered module names.
+	 * @return
+	 */
+	public  Set<String> getAllRegisteredModuleNames(){
+		Set<String> listModuleNames = null;
+		readLock.lock();
+		try{
+			listModuleNames = registredModuleversionInfoMap.keySet();
+		}finally{
+			readLock.unlock();
+		}
+		return listModuleNames;
+	}
 }

@@ -11,18 +11,24 @@ package com.verifone.isd.viper.eps.version;
  *
  */
 public interface VersionManagerConstants {
-	public String UNDERSCORE_SEPARATOR = "_";
-	public String MODULE_NAME = "Module-Name";
-	public String MODULE_VERSION = "Module-Version";
-	public String MODULE_BUILD_TIME = "Module-Build-Time";
-	public String MODULE_HASH = "Module-Hash";
-	public String VERSION_REGEX = "[0-9]{1,2}\\.[0-9]{1,2}\\.[0-9]{1,2}";
-	//IF 2 digits is not mandatory use regex :  [0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9]
-	public String MODULE = "Module";
-	public String NAME = "Name";
-	public String VERSION = "Version";
-	public String BUILD_TIME = "Build-Time";
-	public String HASH = "Module-Hash";
-	public String VIPER_CORE = "Viper Core";
-	public String DEFAULT_VERSION = "0.0.0";
+	public static final  String UNDERSCORE_SEPARATOR = "_";
+	public static final String MODULE_NAME = "Module-Name";
+	public static final String MODULE_VERSION = "Module-Version";
+	public static final String MODULE_BUILD_TIME = "Module-Build-Time";
+	public static final String MODULE_HASH = "Module-Hash";
+	public static final String VERSION_REGEX = "[a-zA-Z0-9]{1,2}\\.[a-zA-Z0-9]{1,2}\\.[a-zA-Z0-9]{1,2}";
+	public static final String MODULE = "Module";
+	public static final String NAME = "Name";
+	public static final String VERSION = "Version";
+	public static final String BUILD_TIME = "Build-Time";
+	public static final String HASH = "Module-Hash";
+	public static final String VIPER_CORE = "Viper Core";
+	public static final String DEFAULT_VERSION = "0.0.0";
+	
+	public static final String PrimaryFEP = "PrimaryFEP";
+	public static final String ViperModule  = "ViperModule";
+	public static final String ViperDemonModule  = "ViperDemonModule";
+	
+	public static final int VERSION_MIN_LENGTH = 5;
+	public static final int VERSION_MAX_LENGTH = 8;
 }

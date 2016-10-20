@@ -5,8 +5,11 @@
  */
 package com.verifone.isd.viper.eps.version;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data bean class which implements VersionInfoInterface
@@ -14,13 +17,15 @@ import java.util.List;
  * @author akshayb1
  *
  */
-public final class VersionInfo implements VersionInfoInterface {
+public final class VersionInfo implements VersionInfoInterface,Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private int modulesReferenceCount = 1;
 	private String moduleName;
 	private String moduleVersion;
 	private String moduleBuildTime;
 	private String moduleBuildHash;
+	private boolean isPrimaryFEP = false;
 	private List<VersionInfoInterface> subModuleVersionInfo;
 	
 	public VersionInfo() {
@@ -84,6 +89,25 @@ public final class VersionInfo implements VersionInfoInterface {
 	}
 	
 	/**
+	 * Constructor for creating version info object when module name,version module build time and build hash & sub version details is known.
+	 * @param moduleName - Name of the module.
+	 * @param moduleVersion- version of the module.
+	 * @param moduleBuildTime - Module build time.
+	 * @param moduleBuildHash - Module build hash.
+	 * @param subModuleVersionInfo -sub version details of the module.
+	 */
+	public VersionInfo(String moduleName, String moduleVersion,
+			String moduleBuildTime, String moduleBuildHash, boolean isPrimaryFEP, 
+			List<VersionInfoInterface> subModuleVersionInfo) {
+		this.moduleName = moduleName;
+		this.moduleVersion = moduleVersion;
+		this.moduleBuildTime = moduleBuildTime;
+		this.moduleBuildHash = moduleBuildHash;
+		this.isPrimaryFEP = isPrimaryFEP;
+		this.subModuleVersionInfo = subModuleVersionInfo;
+	}
+	
+	/**
 	 * Copy constructor to do deep copy of VersionInfoInterface implemented object.
 	 * @param versionInfo
 	 */
@@ -92,7 +116,8 @@ public final class VersionInfo implements VersionInfoInterface {
 		this.moduleVersion = versionInfo.getModuleVersion();
 		this.moduleBuildTime = versionInfo.getModuleBuildTime();
 		this.moduleBuildHash = versionInfo.getModuleBuildHash();
-		List<VersionInfoInterface> subModuleVersionInfo = versionInfo.getSubModuleVersionInfo();
+		this.isPrimaryFEP = versionInfo.isPrimaryFEP();
+		List<VersionInfoInterface> subModuleVersionInfo = versionInfo.getSubModulesVersionInfo();
 		if(subModuleVersionInfo!=null){
 			List<VersionInfoInterface> newSubModuleVersionInfo = new ArrayList<VersionInfoInterface>();
 			for (VersionInfoInterface versionInfoInterface : subModuleVersionInfo) {
@@ -124,7 +149,7 @@ public final class VersionInfo implements VersionInfoInterface {
 	}
 	
 	@Override
-	public List<VersionInfoInterface> getSubModuleVersionInfo() {
+	public List<VersionInfoInterface> getSubModulesVersionInfo() {
 		return subModuleVersionInfo;
 	}
 
@@ -161,27 +186,38 @@ public final class VersionInfo implements VersionInfoInterface {
 	}
 
 	/**
-	 * If the module name and module version are same then both objects are equal.
+	 * If the module name and module version are same then both objects are
+	 * equal. Module build time and build hash is not considered for objects
+	 * compare usually these 2 fields are not mandatory in VersionInfo.
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj){
 			return true;
-		if (obj == null)
+		}
+		if (obj == null){
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		VersionInfo other = (VersionInfo) obj;
-		if (moduleName == null) {
-			if (other.moduleName != null)
+		}
+		if(obj instanceof VersionInfoInterface){
+			VersionInfoInterface other = (VersionInfo) obj;
+			if (moduleName == null) {
+				if (other.getModuleName() != null){
+					return false;
+				}
+			} else if (!moduleName.equals(other.getModuleName())){
 				return false;
-		} else if (!moduleName.equals(other.moduleName))
-			return false;
-		if (moduleVersion == null) {
-			if (other.moduleVersion != null)
+			}
+			if (moduleVersion == null) {
+				if (other.getModuleVersion() != null){
+					return false;
+				}
+			} else if (!moduleVersion.equals(other.getModuleVersion())){
 				return false;
-		} else if (!moduleVersion.equals(other.moduleVersion))
+			}
+		}else{
 			return false;
+		}
+		
 		return true;
 	}
 	
@@ -217,5 +253,99 @@ public final class VersionInfo implements VersionInfoInterface {
 			return true;
 		}
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "VersionInfo [moduleName=" + moduleName + ", moduleVersion="
+				+ moduleVersion + "]";
+	}
+	
+	/**
+	 * API to provide all the sub module version details in HashMap representation.
+	 * Outer HashMap - Key sub module name, Value subversion details.
+	 * Inner HashMap - Key will be attribute(name,version,build time, build hash) and value will be value of attribute.
+	 * 
+	 * @return map of subversion details 
+	 * EX :	{
+	 * 		  Viper Codec={Module-Name=Viper Codec, Module-Version=1.0.0,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 *		  Viper Agent={Module-Name=Viper Agent, Module-Version=1.0.0,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 * 		  Viper Channel={Module-Name=Viper Channel, Module-Version=1.0.1,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash2},
+	 * 		  Viper Report={Module-Name=Viper Report, Module-Version=1.0.0,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 * 		}
+	 */
+	public Map<String, Map<String, String>> getSubModulesVersionInfoMap() {
+		Map<String, Map<String, String>> dataMap = new HashMap<String, Map<String, String>>();
+		List<VersionInfoInterface> subModuleVersionInfoList = getSubModulesVersionInfo();
+		if (subModuleVersionInfoList != null && !subModuleVersionInfoList.isEmpty()) {
+			for (VersionInfoInterface versionInfoInterface : subModuleVersionInfoList) {
+				Map<String, String> subModuleDataMap = new HashMap<String, String>();
+				String name = versionInfoInterface.getModuleName();
+				String version = versionInfoInterface.getModuleVersion();
+				String buildTime = versionInfoInterface.getModuleBuildTime();
+				String buildHash = versionInfoInterface.getModuleBuildHash();
+				if (name != null && !name.trim().isEmpty() 
+						&& version != null && !version.trim().isEmpty()) {
+					subModuleDataMap.put(VersionManagerConstants.MODULE_NAME,name);
+					subModuleDataMap.put(VersionManagerConstants.MODULE_VERSION, version);
+					if (buildTime != null && !buildTime.trim().isEmpty()) {
+						subModuleDataMap.put(VersionManagerConstants.MODULE_BUILD_TIME,buildTime);
+					}
+					if (buildHash != null && !buildHash.trim().isEmpty()) {
+						subModuleDataMap.put(VersionManagerConstants.MODULE_HASH, buildHash);
+					}
+					dataMap.put(versionInfoInterface.getModuleName(),subModuleDataMap);
+				}
+			}
+		}
+		return dataMap;
+	}
+	
+	/**
+	 * API to provide all the sub module version details in HashMap representation.
+	 * Outer container is List.
+	 * Inner container is HashMap - Key will be attribute(name,version,build time, build hash) and value will be value of attribute.
+	 * 
+	 * @return map of subversion details 
+	 * EX :	{
+	 * 			{Module-Name=Viper Codec, Module-Version=1.0.0,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 *			{Module-Name=Viper Agent, Module-Version=1.0.0,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 * 			{Module-Name=Viper Channel, Module-Version=1.0.1,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash2},
+	 * 			{Module-Name=Viper Report, Module-Version=1.0.0,Module-Build-Time=2016-04-03 12:30:22, Module-Hash=some hash1},
+	 * 		}
+	 */
+	public List<Map<String, String>> getSubModulesVersionInfoListMap() {
+		List<Map<String, String>> dataList = new ArrayList<Map<String, String>>();
+		List<VersionInfoInterface> subModuleVersionInfoList = getSubModulesVersionInfo();
+		if (subModuleVersionInfoList != null && !subModuleVersionInfoList.isEmpty()) {
+			for (VersionInfoInterface versionInfoInterface : subModuleVersionInfoList) {
+				Map<String, String> subModuleDataMap = new HashMap<String, String>();
+				String name = versionInfoInterface.getModuleName();
+				String version = versionInfoInterface.getModuleVersion();
+				String buildTime = versionInfoInterface.getModuleBuildTime();
+				String buildHash = versionInfoInterface.getModuleBuildHash();
+				if (name != null && !name.trim().isEmpty() 
+						&& version != null && !version.trim().isEmpty()) {
+					subModuleDataMap.put(VersionManagerConstants.MODULE_NAME,name);
+					subModuleDataMap.put(VersionManagerConstants.MODULE_VERSION, version);
+					if (buildTime != null && !buildTime.trim().isEmpty()) {
+						subModuleDataMap.put(VersionManagerConstants.MODULE_BUILD_TIME,buildTime);
+					}
+					if (buildHash != null && !buildHash.trim().isEmpty()) {
+						subModuleDataMap.put(VersionManagerConstants.MODULE_HASH, buildHash);
+					}
+					dataList.add(subModuleDataMap);
+				}
+			}
+		}
+		return dataList;
+	}
+	
+	public boolean isPrimaryFEP() {
+		return isPrimaryFEP;
+	}
+
+	public void setPrimaryFEP(boolean isPrimaryFEP) {
+		this.isPrimaryFEP = isPrimaryFEP;
 	}
 }
