@@ -16,7 +16,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import test1.CardBean;
+import verifone.CardBean;
 
 import com.verifone.isd.viper.eps.pres.messages.tables.cardTable.CardRowType;
 import com.verifone.isd.viper.eps.pres.messages.tables.cardTable.CardTable;

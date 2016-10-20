@@ -1,16 +1,16 @@
-package tricky;
+package learn.tricky;
 
 
 public class IncrementDecrementQuestion {
 	public static void main(String[] args) {
-		B b = new B();
+		IncrementB b = new IncrementB();
 
 		System.out.println(b.i);
 
 	}
 }
 
-class A
+class IncrementA
 {
     static int i = 1111;
  
@@ -26,7 +26,7 @@ class A
     }
 }
  
-class B extends A
+class IncrementB extends IncrementA
 {
     static
     {

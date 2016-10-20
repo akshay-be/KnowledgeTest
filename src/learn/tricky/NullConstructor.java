@@ -1,4 +1,4 @@
-package tricky;
+package learn.tricky;
 
 public class NullConstructor {
 

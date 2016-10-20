@@ -9,7 +9,7 @@ public class Q18ArrayListTest {
 		ArrayList obj = new ArrayList(4);
 		obj.addElement(new Integer(0));
 		obj.addElement(new Integer(40));
-		obj.addElement(new Integer(0));s
+		obj.addElement(new Integer(0));
 		obj.removeAll(obj);
 		System.out.println(obj.isEmpty());
 	}
