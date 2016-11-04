@@ -64,11 +64,14 @@
 16. Oracle
 	 1.Online MCQ
 	 2.Telephone technical for 50 mins
+	 3. F2f Technical 50 mins (Tanaya)
+     4. F2F technical 1hr (Kuladeep)
+	 5. F2F Manager 15 mins
 17. Wissen Infotech
 	 1.Online MCQ & Programming and subjective for 1hr30mins
 18. Rakuten
 	 1. Telephone technical for 45 mins with (Soumya teamlead)
-	 2. Telephone technical for 20 mins with (Sachin Dalal Vp)
+	 2. Telephone technical for 20 mins with (Sachin Dalal Vice precident)
 19. IVY Comptech Pvt Ltd
 	1. Skype interciew for 1he
 20. Citrix	
@@ -76,20 +79,25 @@
 	 2. F2F Technical 1hr15mins (Shiv)
 21. Appnomics
      1. Telephone technical for 20 mins	 
+	 2. F2f Technical 1 hr 
+	 3. F2F Technical Manager 15 mins
+	 4. F2F HR discussion 30 mins
 22. Amazon
 	 1. F2f Technical 45mins  
 23. Fractel
 	 1. Telephone technical for 45 mins
 24. Eka Solutions
 	 1. Online Coding test 3 programs 90 Mins.
+	 2. F2f Technical 1hr 30 mins (After every answer interviwer was thinking for 2 mins)
 25. Tracxn 
 	 1. Online Coding writing alogorithm for one question 20 mins.
 26. CA Technologies
      1. F2f Technical 50 Mins (Gourav)
      2. F2F technical 1hr (Nithin)
      3. F2F Director 15 mins (RajDeep)
+	 5. Telephonic HR discussion 15 mins (Sreekanth)
 27. Altiux innovations
-	1. Program writing test 6 programs 30 mins.
+	 1. Program writing test 6 programs 30 mins.
 	
 
 Regards,
