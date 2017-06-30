@@ -86,6 +86,7 @@
 	 1. F2f Technical 45mins  
 23. Fractel
 	 1. Telephone technical for 45 mins
+	 2. Telephone technical for 60 mins
 24. Eka Solutions
 	 1. Online Coding test 3 programs 90 Mins.
 	 2. F2f Technical 1hr 30 mins (After every answer interviwer was thinking for 2 mins)
@@ -93,7 +94,7 @@
 	 1. Online Coding writing alogorithm for one question 20 mins.
 26. CA Technologies
      1. F2f Technical 50 Mins (Gourav)
-     2. F2F technical 1hr (Nithin)
+     2. F2F technical 1hr (Pradeep)
      3. F2F Director 15 mins (RajDeep)
 	 5. Telephonic HR discussion 15 mins (Sreekanth)
 27. Altiux innovations
